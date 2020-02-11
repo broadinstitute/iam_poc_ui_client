@@ -25,7 +25,6 @@
             var code = params.get('code');
             if (code) {
                 $("#auth_code").val(code);
-                var state = params.get('state');
                 // validateState(state);
                 if (window.localStorage.getItem('primary_token')) {
                     linkAccount(code);

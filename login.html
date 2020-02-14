@@ -1,5 +1,6 @@
 <html>
 <head>
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
         var clientId = "903cfaeb-57d9-4ef6-5659-04377794ed65";
@@ -10,61 +11,39 @@
         var userinfoURL = "_HYDRA_URL_/userinfo";
         var realm = "master";
         var accountURL = "_IC_URL_/identity/scim/v2/_REALM_/Me?client_id=" + clientId + "&client_secret=" + clientSecret;
-
-
-        function init() {
-            var hydraUrl = $("#hydra_url").val();
-            if (hydraUrl.includes("//localhost:")) {
-                var port = new URL(hydraUrl).port;
-                hydraUrl = `${window.location.protocol}//${window.location.hostname}:${port}`;
-                $("#hydra_url").val(hydraUrl);
-                port = new URL($("#ic_url").val()).port;
-                $("#ic_url").val(`${window.location.protocol}//${window.location.hostname}:${port}`);
-            }
-            var params = new URLSearchParams(window.location.search);
-            var code = params.get('code');
-            if (code) {
-                $("#auth_code").val(code);
-                // validateState(state);
-                if (window.localStorage.getItem('primary_token')) {
-                    linkAccount(code);
-                }
-            }
-        }
+        var coreUrl = "http://35.226.243.65/core";
+        var kernelUrl = "?/kernel";
 
         function core_layer() {
-            var tok = $("#token").val();
-            if (!tok) {
-                $("#log").text("must login first...");
-                return;
-            }
-            var url = makeURL(userinfoURL);
+            var tok = document.getElementById("token").value;
+            console.log(tok);
+
+            var url = makeURL(coreUrl);
             $.ajax({
                 url: url,
-                type: "GET",
-                beforeSend: function(xhr){xhr.setRequestHeader('Authorization', 'Bearer ' + tok)},
+                type: 'GET',
+                contentType: 'text/html; charset=utf-8',
+                headers: {
+                    'Authorization': 'Bearer ' + tok
+                },
                 success: function(resp) {
-                    $("#log").text("Userinfo: " + JSON.stringify(resp, undefined, 2));
+                    console.log("111111");
+                    $("#log").text("Core response: " + JSON.stringify(resp, undefined, 2));
                 },
                 error: function(err) {
+                    console.log("222222");
                     $("#log").text(JSON.stringify(err, undefined, 2));
                 }
             });
         }
 
         function kernel_layer() {
-            var tok = $("#token").val();
-            if (!tok) {
-                $("#log").text("must login first...");
-                return;
-            }
-            var url = makeURL(userinfoURL);
+            var url = makeURL(coreUrl);
             $.ajax({
                 url: url,
                 type: "GET",
-                beforeSend: function(xhr){xhr.setRequestHeader('Authorization', 'Bearer ' + tok)},
                 success: function(resp) {
-                    $("#log").text("Userinfo: " + JSON.stringify(resp, undefined, 2));
+                    $("#log").text("Core resaponse: " + JSON.stringify(resp, undefined, 2));
                 },
                 error: function(err) {
                     $("#log").text(JSON.stringify(err, undefined, 2));
@@ -139,12 +118,14 @@
         }
     </script>
 </head>
-<body onload="init()">
+<body>
 <h1>IAM POC UI</h1>
 <div class="box">
     <h3>Login to IC</h3>
-    <input id="access_token" style="width:50%" value="">
     <input id="ic_url" style="width:49%" value="https://ic-dot-dogeictest.appspot.com">
+    <p>Click <a href="https://icdemo-dot-dogeictest.appspot.com/test"> here </a>login to IC and get toke back<br></p>
+    <h3>Access Core App</h3>
+    Token: <textarea id="token" rows="5" cols="100"></textarea>
     <div>
         <button onclick="core_layer()">Core Layer</button>
         <button onclick="kernel_layer()">Kernel Layer</button>
@@ -152,8 +133,7 @@
     </div>
 </div>
 <div class="box">
-    <h3>3. Passport</h3>
-    <textarea id="token" rows="7" style="width:100%" readonly></textarea>
+    <h3>Passport</h3>
     <div>
         <button onclick="userinfo()">Pass Token Info</button>
         <button onclick="accountInfo()">Get User Info</button>

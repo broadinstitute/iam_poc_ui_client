@@ -12,7 +12,8 @@
         var realm = "master";
         var accountURL = "_IC_URL_/identity/scim/v2/_REALM_/Me?client_id=" + clientId + "&client_secret=" + clientSecret;
         var coreUrl = "http://35.226.243.65/core";
-        var kernelUrl = "?/kernel";
+        var coreKernel1Url = "http://35.226.243.65/coreToKernel1";
+        var coreKernel2Url = "http://35.226.243.65/coreToKernel2";
 
         function core_layer() {
             var tok = document.getElementById("token").value;
@@ -37,13 +38,28 @@
             });
         }
 
-        function kernel_layer() {
-            var url = makeURL(coreUrl);
+        function core_kernel1_layer() {
+            var url = makeURL(coreKernel1Url);
             $.ajax({
                 url: url,
                 type: "GET",
                 success: function(resp) {
-                    $("#log").text("Core resaponse: " + JSON.stringify(resp, undefined, 2));
+                    $("#log").text("Core to kernel1: " + JSON.stringify(resp, undefined, 2));
+                },
+                error: function(err) {
+                    $("#log").text(JSON.stringify(err, undefined, 2));
+                }
+            });
+        }
+
+
+        function core_kernel1_layer() {
+            var url = makeURL(coreKernel2Url);
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function(resp) {
+                    $("#log").text("Core to kernel1: " + JSON.stringify(resp, undefined, 2));
                 },
                 error: function(err) {
                     $("#log").text(JSON.stringify(err, undefined, 2));
@@ -123,12 +139,13 @@
 <div class="box">
     <h3>Login to IC</h3>
     <input id="ic_url" style="width:49%" value="https://ic-dot-dogeictest.appspot.com">
-    <p>Click <a href="https://icdemo-dot-dogeictest.appspot.com/test"> here </a>login to IC and get toke back<br></p>
+    <p>Click <a href="https://icdemo-dot-dogeictest.appspot.com/test" target="_blank"> here </a>login to IC and get toke back<br></p>
     <h3>Access Core App</h3>
     Token: <textarea id="token" rows="5" cols="100"></textarea>
     <div>
         <button onclick="core_layer()">Core Layer</button>
-        <button onclick="kernel_layer()">Kernel Layer</button>
+        <button onclick="core_kernel1_layer()">Core to Kernel1</button>
+        <button onclick="core_kernel2_layer()">Core to Kernel2</button>
         <button onclick="clearPage()">Clear</button>
     </div>
 </div>
